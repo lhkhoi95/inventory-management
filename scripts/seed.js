@@ -7,24 +7,28 @@ DUMMY_INVENTORY = [
     quantity: 10,
     image:
       "https://images.pexels.com/photos/102104/pexels-photo-102104.jpeg?auto=compress&cs=tinysrgb&w=600",
+    public_id: "apple",
   },
   {
     name: "banana",
     quantity: 20,
     image:
       "https://images.pexels.com/photos/2872767/pexels-photo-2872767.jpeg?auto=compress&cs=tinysrgb&w=600",
+    public_id: "banana",
   },
   {
     name: "cherry",
     quantity: 30,
     image:
       "https://images.pexels.com/photos/23183/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=600",
+    public_id: "cherry",
   },
   {
     name: "mango",
     quantity: 40,
     image:
       "https://images.pexels.com/photos/2935021/pexels-photo-2935021.jpeg?auto=compress&cs=tinysrgb&w=600",
+    public_id: "mango",
   },
 ];
 
@@ -35,7 +39,8 @@ async function seedInventory(client) {
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         quantity INT NOT NULL,
-        image VARCHAR(255)
+        image VARCHAR(255),
+        public_id VARCHAR(255)
       );
     `;
 
@@ -44,8 +49,8 @@ async function seedInventory(client) {
     // Insert the dummy inventory data
     for (const item of DUMMY_INVENTORY) {
       await client.sql`
-        INSERT INTO inventory (name, quantity, image)
-        VALUES (${item.name}, ${item.quantity}, ${item.image});
+        INSERT INTO inventory (name, quantity, image, public_id)
+        VALUES (${item.name}, ${item.quantity}, ${item.image}, ${item.public_id});
       `;
     }
 

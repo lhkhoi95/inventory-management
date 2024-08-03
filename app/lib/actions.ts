@@ -4,8 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { sql } from "@vercel/postgres";
 import { redirect } from "next/navigation";
-import { writeFile, mkdir, unlink } from "fs/promises";
-import path from "path";
+import { removeImage, storeImage } from "./cloudinary";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = [
@@ -56,11 +55,10 @@ export async function addItem(
 
   try {
     // Store the image
-    const filename = await storeImage(image as File, name);
-    const imagePath = `/uploads/${filename}`;
+    const { imageUrl, publicId } = await storeImage(image as File, name);
 
     // Save the image path to the database
-    await sql`INSERT INTO inventory (name, quantity, image) VALUES (${name}, ${quantity}, ${imagePath})`;
+    await sql`INSERT INTO inventory (name, quantity, image, public_id) VALUES (${name}, ${quantity}, ${imageUrl}, ${publicId})`;
   } catch (error) {
     console.error("Error in addItem:", (error as Error).message);
     return {
@@ -73,43 +71,27 @@ export async function addItem(
 }
 
 export async function removeItem(itemId: number): Promise<void> {
-  console.log("Removing item from inventory:", itemId);
-
+  // Remove the image from Cloudinary
   try {
-    // First, retrieve the image path from the database
-    const result = await sql`SELECT image FROM inventory WHERE id = ${itemId}`;
+    const imageToDelete =
+      await sql`SELECT public_id FROM inventory WHERE id = ${itemId}`;
 
-    if (result.rows.length === 0) {
-      throw new Error("Item not found.");
-    }
+    await removeImage(imageToDelete.rows[0].public_id);
+  } catch (error) {
+    console.error("Error in removeItem:", error);
+    throw new Error("Failed to remove item on Cloudinary.");
+  }
 
-    const imagePath = result.rows[0].image;
-
-    // Delete the image file if it exists
-    if (imagePath) {
-      const fullPath = path.join(process.cwd(), "public", imagePath);
-      try {
-        await unlink(fullPath);
-        console.log(`Deleted image file: ${fullPath}`);
-      } catch (unlinkError) {
-        console.error("Error deleting file:", unlinkError);
-        // We'll continue even if file deletion fails
-      }
-    }
-
-    // Delete the item from the database
+  // Remove the item from the database
+  try {
     await sql`DELETE FROM inventory WHERE id = ${itemId}`;
-    console.log(`Deleted item with ID: ${itemId} from the database`);
   } catch (error) {
     console.error(
       "Database Error: Failed to remove item from inventory:",
       error
     );
-    throw new Error(
-      "Failed to remove item from inventory: " + (error as Error).message
-    );
+    throw new Error("Database Error: Failed to remove item from inventory.");
   }
-
   revalidatePath("/");
 }
 
@@ -120,15 +102,7 @@ export async function updateItem(
   console.log("Updating item in inventory:", itemId);
 
   if (quantity === 0) {
-    try {
-      await sql`DELETE FROM inventory WHERE id = ${itemId}`;
-    } catch (error) {
-      console.error(
-        "Database Error: Failed to remove item from inventory:",
-        error
-      );
-      throw new Error("Database Error: Failed to remove item from inventory.");
-    }
+    await removeItem(itemId);
   }
 
   try {
@@ -139,31 +113,4 @@ export async function updateItem(
   }
 
   revalidatePath("/");
-}
-
-async function storeImage(image: File, name: string): Promise<string> {
-  try {
-    // Process the image
-    const bytes = await image.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    // Generate a unique filename
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    const filename = `${name
-      .replace(/\s+/g, "-")
-      .toLowerCase()}-${uniqueSuffix}${path.extname(image.name)}`;
-
-    // Ensure the upload directory exists
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadDir, { recursive: true });
-
-    // Save the file
-    const filePath = path.join(uploadDir, filename);
-    await writeFile(filePath, buffer);
-
-    return filename;
-  } catch (error) {
-    console.error("Error storing image:", error);
-    throw new Error("Failed to store image.");
-  }
 }
