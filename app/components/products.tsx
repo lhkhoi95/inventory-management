@@ -1,8 +1,14 @@
 import { CircleButton } from "./ui/Buttons";
 import { removeItem, updateItem } from "../lib/actions";
 import { trashIcon } from "./ui/Icons";
+import { fetchInventoryItems } from "../lib/data";
 
-export default function Products({ items }: { items: InventoryItem[] }) {
+export default async function Products({ query }: { query: string }) {
+  const items = await fetchInventoryItems(query);
+
+  // Delay 1 second to simulate loading
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
   return (
     <div className="mb-12 mt-4 rounded-lg border-8 border-[#2a3b45]">
       {items.length > 0 ? (
@@ -26,7 +32,7 @@ export default function Products({ items }: { items: InventoryItem[] }) {
                   <span>Qty: {item.quantity}</span>
                 </div>
 
-                <div className="ml-auto flex flex-row justify-items-end gap-2 py-2 pr-2">
+                <div className="flex w-full flex-row justify-end justify-items-end gap-2 p-2">
                   <AddOne itemId={item.id} quantity={item.quantity} />
                   <RemoveOne itemId={item.id} quantity={item.quantity} />
                   <DeleteItem id={item.id} />
@@ -59,18 +65,18 @@ export default function Products({ items }: { items: InventoryItem[] }) {
                   key={item.id}
                   className="border-b-[1px] border-[#2a3b45] text-sm font-normal"
                 >
-                  <td className="px-4 py-4">
+                  <td className="w-1/6 px-4 py-4">
                     <img
                       src={item.image}
                       alt={item.name}
                       className="h-10 w-10 rounded-md object-cover"
                     />
                   </td>
-                  <td className="px-3 py-4">
+                  <td className="w-2/6 px-3 py-4">
                     {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
                   </td>
-                  <td className="px-3 py-4">{item.quantity}</td>
-                  <td className="py-2">
+                  <td className="w-1/6 px-3 py-4">{item.quantity}</td>
+                  <td className="w-2/6 py-2">
                     <div className="flex flex-row items-center gap-2 px-3 py-4">
                       <AddOne itemId={item.id} quantity={item.quantity} />
                       <RemoveOne itemId={item.id} quantity={item.quantity} />

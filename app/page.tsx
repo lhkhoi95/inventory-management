@@ -1,9 +1,10 @@
+import { Suspense } from "react";
 import Products from "./components/products";
 import { Button } from "./components/ui/Buttons";
 import { plusIcon } from "./components/ui/Icons";
 import SearchBar from "./components/ui/SearchBar";
-import { fetchInventoryItems } from "./lib/data";
 import { redirect } from "next/navigation";
+import ProductsSkeleton from "./components/ui/skeletons";
 
 async function handleAddItem() {
   "use server";
@@ -17,11 +18,8 @@ export default async function Home({
   };
 }) {
   const query = searchParams?.query || "";
-  const data = await fetchInventoryItems(query);
-  // console.log(data);
-
   return (
-    <main className="box-border flex w-full flex-col gap-5 px-4 md:px-48">
+    <main className="box-border flex w-full flex-col gap-5 px-4 lg:px-44">
       <h1 className="mt-4 text-center text-4xl uppercase md:text-8xl">
         Inventory
       </h1>
@@ -38,8 +36,9 @@ export default async function Home({
           </Button>
         </form>
       </div>
-
-      <Products items={data} />
+      <Suspense fallback={<ProductsSkeleton />}>
+        <Products query={query} />
+      </Suspense>
     </main>
   );
 }

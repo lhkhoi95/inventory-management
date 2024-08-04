@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Button, CircleButton } from "./ui/Buttons";
 import { cameraIcon, closeIcon, uploadIcon } from "./ui/Icons";
-import { useFormState } from "react-dom";
+import { useFormState, useFormStatus } from "react-dom";
 import { addItem } from "@/app/lib/actions";
 import CameraComponent from "./ui/CameraComponent";
 
@@ -32,7 +32,7 @@ export default function CreateItemForm() {
   const handleCapture = async (image: string) => {
     setImageUrl(image);
 
-    // Convert base64 string to File
+    // Convert type base64 string to type File
     const base64Response = await fetch(image);
     const blob = await base64Response.blob();
     const file = new File([blob], `capture_${new Date().getTime()}.jpg`, {
@@ -95,6 +95,7 @@ export default function CreateItemForm() {
           <span className="my-4 text-left">Image:</span>
           <div className="mt-4 flex items-center justify-center gap-8 text-xs text-stone-300">
             <div className="flex flex-col items-center justify-center gap-1 align-middle">
+              {/* Upload Button */}
               <CircleButton type="button">
                 <input
                   type="file"
@@ -109,7 +110,8 @@ export default function CreateItemForm() {
               <span>Upload</span>
             </div>
 
-            <div className="flex flex-col items-center justify-center gap-1 align-middle">
+            {/* Camera Button only for desktop*/}
+            <div className="hidden flex-col items-center justify-center gap-1 align-middle lg:flex">
               <CircleButton type="button" onClick={() => setShowCamera(true)}>
                 {cameraIcon}
               </CircleButton>
