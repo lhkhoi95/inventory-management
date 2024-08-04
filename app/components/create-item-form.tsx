@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button, CircleButton } from "./ui/Buttons";
-import { cameraIcon, closeIcon, uploadIcon } from "./ui/Icons";
-import { useFormState, useFormStatus } from "react-dom";
+import { Button } from "./ui/Buttons";
+import { useFormState } from "react-dom";
 import { addItem } from "@/app/lib/actions";
 import CameraComponent from "./ui/CameraComponent";
+import TextInput from "./ui/TextInput";
+import ImageUpload from "./ui/ImageInput";
+import { Modal } from "./ui/Modal";
 
 export default function CreateItemForm() {
   const initialState: FormState = { message: null };
@@ -57,68 +59,26 @@ export default function CreateItemForm() {
         className="m-4 mx-auto flex w-80 flex-col gap-6 rounded-md border-4 border-[#2a3b45] p-4 align-middle md:w-96"
       >
         {/* Inventory Name */}
-        <label className="flex flex-col text-white">
-          Name:
-          <input
-            className="mt-1 rounded-md p-2 text-sm text-black"
-            placeholder="e.g: Pens"
-            type="text"
-            name="name"
-            aria-describedby="name-error"
-          />
-          {state.errors?.name && (
-            <span id="name-error" className="mt-4 text-red-500">
-              {state.errors.name[0]}
-            </span>
-          )}
-        </label>
+        <TextInput
+          label="Name"
+          name="name"
+          placeholder="e.g: Pens"
+          error={state.errors?.name ? state.errors.name[0] : undefined}
+        />
 
         {/* Quantity */}
-        <label className="flex flex-col text-white">
-          Quantity:
-          <input
-            className="mt-1 rounded-md p-2 text-sm text-black"
-            placeholder="e.g: 10"
-            type="number"
-            name="quantity"
-            aria-describedby="quantity-error"
-          />
-          {state.errors?.quantity && (
-            <span id="quantity-error" className="mt-4 text-red-500">
-              {state.errors.quantity[0]}
-            </span>
-          )}
-        </label>
+        <TextInput
+          label="Quantity"
+          name="quantity"
+          placeholder="e.g: 10"
+          error={state.errors?.quantity ? state.errors.quantity[0] : undefined}
+        />
 
         {/* Image Upload */}
-        <label>
-          <span className="my-4 text-left">Image:</span>
-          <div className="mt-4 flex items-center justify-center gap-8 text-xs text-stone-300">
-            <div className="flex flex-col items-center justify-center gap-1 align-middle">
-              {/* Upload Button */}
-              <CircleButton type="button">
-                <input
-                  type="file"
-                  accept="image/*"
-                  name="image"
-                  id="image-upload"
-                  className="hidden"
-                  onChange={handleFileChange}
-                />
-                <label htmlFor="image-upload">{uploadIcon}</label>
-              </CircleButton>
-              <span>Upload</span>
-            </div>
-
-            {/* Camera Button only for desktop*/}
-            <div className="hidden flex-col items-center justify-center gap-1 align-middle lg:flex">
-              <CircleButton type="button" onClick={() => setShowCamera(true)}>
-                {cameraIcon}
-              </CircleButton>
-              <span>Camera</span>
-            </div>
-          </div>
-        </label>
+        <ImageUpload
+          handleFileChange={handleFileChange}
+          setShowCamera={setShowCamera}
+        />
 
         {/* Display Taken/Uploaded Image */}
         {imageUrl && (
@@ -145,22 +105,5 @@ export default function CreateItemForm() {
         </Modal>
       )}
     </>
-  );
-}
-
-export function Modal({
-  children,
-  onClose,
-}: {
-  children: React.ReactNode;
-  onClose: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-90 text-right text-gray-800">
-      <div className="w-96 max-w-lg rounded-lg bg-purple-100 p-4">
-        <CircleButton onClick={onClose}>{closeIcon}</CircleButton>
-        {children}
-      </div>
-    </div>
   );
 }
