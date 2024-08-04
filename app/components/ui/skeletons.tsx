@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function ProductsSkeleton() {
+export function ProductsSkeleton() {
   return (
     <div className="mb-12 mt-4 rounded-lg border-8 border-[#2a3b45]">
       {/* Mobile Skeleton */}

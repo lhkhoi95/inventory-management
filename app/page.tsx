@@ -4,7 +4,7 @@ import { Button } from "./components/ui/Buttons";
 import { plusIcon } from "./components/ui/Icons";
 import SearchBar from "./components/ui/SearchBar";
 import { redirect } from "next/navigation";
-import ProductsSkeleton from "./components/ui/Skeletons";
+import { ProductsSkeleton } from "./components/ui/Skeletons";
 
 async function handleAddItem() {
   "use server";
