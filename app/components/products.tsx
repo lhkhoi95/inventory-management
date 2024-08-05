@@ -6,8 +6,8 @@ import { fetchInventoryItems } from "../lib/data";
 export default async function Products({ query }: { query: string }) {
   const items = await fetchInventoryItems(query);
 
-  // Delay 1 second to simulate loading
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  // // Delay 1 second to simulate loading
+  // await new Promise((resolve) => setTimeout(resolve, 1000));
 
   return (
     <div className="mb-12 mt-4 rounded-lg border-8 border-[#2a3b45]">
