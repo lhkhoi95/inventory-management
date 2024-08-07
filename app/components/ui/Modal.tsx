@@ -6,7 +6,7 @@ export function Modal({
   onClose,
 }: {
   children: React.ReactNode;
-  onClose: () => void;
+  onClose?: () => void;
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-90 text-right text-gray-800">

@@ -1,15 +1,26 @@
 "use client";
+import { getRandomColor } from "@/app/lib/colors";
 import React from "react";
 import { useFormStatus } from "react-dom";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   classes?: string;
+  onPending?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Default Button
-export function Button({ children, classes, ...props }: ButtonProps) {
+export function Button({
+  children,
+  classes,
+  onPending,
+  ...props
+}: ButtonProps) {
   const { pending } = useFormStatus();
+
+  if (onPending) {
+    onPending(pending ? true : false);
+  }
 
   return (
     <button
@@ -84,6 +95,22 @@ export function CircleButton({ children, classes, ...props }: ButtonProps) {
       >
         {children}
       </span>
+    </button>
+  );
+}
+// Tag Button
+export function TagButton({ children, classes, ...props }: ButtonProps) {
+  const { pending } = useFormStatus();
+
+  return (
+    <button
+      {...props}
+      className={`inline-block focus:outline-none hover:brightness-110 text-xs rounded-full ${getRandomColor()} p-2 ${classes} ${
+        pending ? "opacity-70" : ""
+      }`}
+      disabled={pending}
+    >
+      {children}
     </button>
   );
 }

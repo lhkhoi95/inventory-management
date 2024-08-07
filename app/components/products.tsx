@@ -10,7 +10,7 @@ export default async function Products({ query }: { query: string }) {
   // await new Promise((resolve) => setTimeout(resolve, 1000));
 
   return (
-    <div className="mb-12 mt-4 rounded-lg border-8 border-[#2a3b45]">
+    <div className="my-4 mb-12 mt-4 rounded-lg border-8 border-[#2a3b45]">
       {items.length > 0 ? (
         <>
           {/* Table for mobile */}

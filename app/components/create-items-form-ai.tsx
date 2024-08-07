@@ -1,22 +1,28 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { Button } from "./ui/Buttons";
 import { useFormState } from "react-dom";
-import { addItem } from "@/app/lib/actions";
+import { addItems, fetchItemsAI } from "@/app/lib/actions";
 import CameraComponent from "./ui/CameraComponent";
-import TextInput from "./ui/TextInput";
 import ImageUpload from "./ui/ImageInput";
 import { Modal } from "./ui/Modal";
-import { sparkIcon } from "./ui/Icons";
-import Link from "next/link";
+import AIGeneratedItemsTable from "./ui/AIGeneratedItemsTable";
 
-export default function CreateItemForm() {
-  const initialState: FormState = { message: null };
-  const [state, dispatch] = useFormState(addItem, initialState);
+export default function CreateItemsAIForm() {
+  const initialState: FormState = { message: null, items: null };
+  const [state, dispatch] = useFormState(fetchItemsAI, initialState);
   const [showCamera, setShowCamera] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [selectedItems, setSelectedItems] = useState<AIDetectedItem[] | []>([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  useEffect(() => {
+    if (state.items) {
+      setSelectedItems(state.items);
+    }
+  }, [state.items]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -47,40 +53,36 @@ export default function CreateItemForm() {
   };
 
   const handleSubmit = async (formData: FormData) => {
+    setSelectedItems([]);
     // Attach the image file of type File to the field "image" in the FormData object
     if (imageFile) {
+      formData.set("name", imageFile.name);
       formData.set("image", imageFile);
     }
     dispatch(formData);
   };
 
+  const handleRemoveItem = (index: number) => {
+    const updatedItems = selectedItems.filter((_, i) => i !== index);
+    setSelectedItems(updatedItems);
+  };
+
+  const handleAddItem = (item: AIDetectedItem) => {
+    setSelectedItems([...selectedItems, item]);
+  };
+
   return (
-    <>
+    <div className="flex flex-row flex-wrap gap-4">
       <form
         action={handleSubmit}
         className="m-4 mx-auto flex w-80 flex-col gap-6 rounded-md border-4 border-[#2a3b45] p-4 align-middle md:w-96"
       >
-        {/* Inventory Name */}
-        <TextInput
-          label="Name"
-          name="name"
-          placeholder="e.g: Pens"
-          error={state.errors?.name ? state.errors.name[0] : undefined}
-        />
-
-        {/* Quantity */}
-        <TextInput
-          label="Quantity"
-          name="quantity"
-          placeholder="e.g: 10"
-          error={state.errors?.quantity ? state.errors.quantity[0] : undefined}
-        />
-
+        <h1 className="mx-auto mt-4 text-xl">Upload an Image to continue</h1>
         {/* Image Upload */}
         <ImageUpload
           handleFileChange={handleFileChange}
           setShowCamera={setShowCamera}
-          label="Image"
+          label={""}
         />
 
         {/* Display Taken/Uploaded Image */}
@@ -91,7 +93,9 @@ export default function CreateItemForm() {
           </div>
         )}
 
-        <Button type="submit">Add Item</Button>
+        <Button type="submit" onPending={setIsAnalyzing}>
+          Analyze
+        </Button>
 
         {/* Error Message */}
         {state.message && (
@@ -100,22 +104,51 @@ export default function CreateItemForm() {
         {state.errors?.image && (
           <span className="mx-auto text-red-500">{state.errors.image[0]}</span>
         )}
-        <span className="flex items-center justify-end gap-1 text-xs">
-          <Link
-            href="/create-products-ai"
-            className="hover: bg-gradient-to-tr from-purple-700 to-blue-500 bg-clip-text font-bold text-transparent hover:text-pink-500"
-          >
-            Auto-detect objects
-          </Link>{" "}
-          {sparkIcon}
-        </span>
       </form>
+
+      {/* Display the AI generated items */}
+      <div className="mx-auto my-4 w-80 rounded-md border-4 border-[#2a3b45] p-4 text-center md:w-96">
+        <AIGeneratedItemsTable
+          items={selectedItems}
+          onRemove={handleRemoveItem}
+          onAdd={handleAddItem}
+          isPending={isAnalyzing}
+        />
+
+        {!isAnalyzing && imageFile && (
+          <AddItems items={selectedItems} image={imageFile} />
+        )}
+      </div>
 
       {showCamera && (
         <Modal onClose={() => setShowCamera(false)}>
           <CameraComponent onCapture={handleCapture} />
         </Modal>
       )}
-    </>
+    </div>
+  );
+}
+
+export function AddItems({
+  items,
+  image,
+}: {
+  items: AIDetectedItem[];
+  image: File;
+}) {
+  const initialState: FormState = { message: null };
+  const [state, dispatch] = useFormState(addItems, initialState);
+
+  const handleSubmit = async (formData: FormData) => {
+    formData.set("items", JSON.stringify(items));
+    formData.set("image", image);
+    dispatch(formData);
+  };
+
+  return (
+    <form action={handleSubmit}>
+      <input type="hidden" name="items" value={JSON.stringify(items)} />
+      <Button type="submit">Add To Inventory</Button>
+    </form>
   );
 }

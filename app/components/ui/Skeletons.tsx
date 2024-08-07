@@ -30,7 +30,6 @@ export function ProductsSkeleton() {
       </div>
 
       {/* Desktop Skeleton */}
-      {/* Desktop Skeleton */}
       <table className="hidden min-w-full md:table">
         <thead className="bg-[#2a3b45] text-left text-sm font-bold">
           <tr>

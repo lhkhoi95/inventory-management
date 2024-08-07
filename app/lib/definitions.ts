@@ -6,6 +6,15 @@ interface InventoryItem {
   quantity: number;
 }
 
+interface AIDetectedItem {
+  name: string;
+  quantity: number;
+}
+
+interface AIDetectedItems {
+  items: AIDetectedItem[];
+}
+
 type FormState = {
   errors?: {
     name?: string[];
@@ -14,6 +23,7 @@ type FormState = {
     public_id?: string[];
   };
   message: string | null;
+  items?: AIDetectedItem[] | null;
 };
 
 interface CloudinaryResponse {

@@ -5,15 +5,17 @@ import { cameraIcon, uploadIcon } from "./Icons";
 interface ImageUploadProps {
   handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   setShowCamera: (show: boolean) => void;
+  label: string;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
   handleFileChange,
   setShowCamera,
+  label,
 }) => {
   return (
     <label>
-      <span className="my-4 text-left">Image:</span>
+      <span className="my-4 text-left">{label}</span>
       <div className="mt-4 flex items-center justify-center gap-8 text-xs text-stone-300">
         <div className="flex flex-col items-center justify-center gap-1 align-middle">
           {/* Upload Button */}

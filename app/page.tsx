@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Products from "./components/products";
 import { Button } from "./components/ui/Buttons";
-import { plusIcon, sparkIcon } from "./components/ui/Icons";
+import { plusIcon } from "./components/ui/Icons";
 import SearchBar from "./components/ui/SearchBar";
 import { redirect } from "next/navigation";
 import { ProductsSkeleton } from "./components/ui/Skeletons";
@@ -27,7 +27,7 @@ export default async function Home({
         <SearchBar />
 
         {/* Create Item Button */}
-        <form className="flex" action={handleAddItem}>
+        <form className="flex flex-wrap gap-2" action={handleAddItem}>
           <Button>
             <div className="flex flex-row items-center justify-items-center md:gap-2">
               <span className="hidden md:block">Create Item</span>

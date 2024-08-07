@@ -106,7 +106,7 @@ export const trashIcon = (
     viewBox="0 0 24 24"
     strokeWidth="1.5"
     stroke="currentColor"
-    className="w-6"
+    className="size-6"
   >
     <path
       strokeLinecap="round"
@@ -120,8 +120,36 @@ export const sparkIcon = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
-    className="size-6 bg-white text-white"
+    className="size-4"
   >
-    <path d="M10,21.236,6.755,14.745.264,11.5,6.755,8.255,10,1.764l3.245,6.491L19.736,11.5l-6.491,3.245ZM4.736,11.5l3.509,1.755L10,16.764l1.755-3.509L15.264,11.5,11.755,9.745,10,6.236,8.245,9.745ZM18,21l1.5,3L21,21l3-1.5L21,18l-1.5-3L18,18l-3,1.5ZM19.333,4.667,20.5,7l1.167-2.333L24,3.5,21.667,2.333,20.5,0,19.333,2.333,17,3.5Z" />
+    <defs>
+      <linearGradient id="iconGradient" gradientTransform="rotate(45)">
+        <stop offset="0%" stopColor="#8000FF" />
+        <stop offset="100%" stopColor="#0080FF" />
+      </linearGradient>
+    </defs>
+    <path
+      d="M10,21.236,6.755,14.745.264,11.5,6.755,8.255,10,1.764l3.245,6.491L19.736,11.5l-6.491,3.245ZM4.736,11.5l3.509,1.755L10,16.764l1.755-3.509L15.264,11.5,11.755,9.745,10,6.236,8.245,9.745ZM18,21l1.5,3L21,21l3-1.5L21,18l-1.5-3L18,18l-3,1.5ZM19.333,4.667,20.5,7l1.167-2.333L24,3.5,21.667,2.333,20.5,0,19.333,2.333,17,3.5Z"
+      fill="url(#iconGradient)"
+    />
   </svg>
 );
+
+export default function crossIcon({ classes }: { classes: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth="1.5"
+      stroke="currentColor"
+      className={`size-6 ${classes}`}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+      />
+    </svg>
+  );
+}
