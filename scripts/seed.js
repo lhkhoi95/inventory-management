@@ -32,6 +32,28 @@ DUMMY_INVENTORY = [
   },
 ];
 
+async function seedUsers(client) {
+  try {
+    await client.sql`
+      CREATE TABLE IF NOT EXISTS inventory_users
+      (
+        id SERIAL,
+        name VARCHAR(255),
+        email VARCHAR(255),
+        "emailVerified" TIMESTAMPTZ,
+        image TEXT,
+      
+        PRIMARY KEY (id)
+      );
+    `;
+
+    console.log(`Created "users" table`);
+  } catch (error) {
+    console.error("Error seeding users:", error);
+    throw error;
+  }
+}
+
 async function seedInventory(client) {
   try {
     const createTable = await client.sql`
@@ -66,6 +88,9 @@ async function seedInventory(client) {
 async function main() {
   // Create a new client
   const client = await db.connect();
+
+  // Create the "users" table
+  await seedUsers(client);
 
   // Create the "inventory" table
   await seedInventory(client);

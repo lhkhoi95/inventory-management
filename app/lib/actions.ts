@@ -6,6 +6,7 @@ import { sql } from "@vercel/postgres";
 import { redirect } from "next/navigation";
 import { removeImage, storeImage } from "./cloudinary";
 import { itemsRecognizer } from "./image-processing";
+import sharp from "sharp";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = [
@@ -159,11 +160,20 @@ export async function fetchItemsAI(
   let { imageUrl, publicId } = { imageUrl: "", publicId: "" };
 
   try {
-    // Store image in Cloudinary
-    ({ imageUrl, publicId } = await storeImage(imageFile, imageName));
+    // Convert image to JPEG buffer
+    const imageBuffer = Buffer.from(await imageFile.arrayBuffer());
+    const jpegBuffer = await sharp(imageBuffer).jpeg().toBuffer();
+
+    // Convert JPEG buffer back to File object
+    const jpegFile = new File([jpegBuffer], imageName + ".jpg", {
+      type: "image/jpeg",
+    });
+
+    // Store JPEG image in Cloudinary
+    ({ imageUrl, publicId } = await storeImage(jpegFile, imageName));
   } catch (error) {
-    console.error("Error uploading image to Cloudinary:", error);
-    return { message: "Failed to upload image to Cloudinary." };
+    console.error("Error processing or uploading image:", error);
+    return { message: "Failed to process or upload image." };
   }
 
   try {
